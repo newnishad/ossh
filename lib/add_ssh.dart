@@ -22,7 +22,7 @@ class AddSSH extends StatefulWidget {
 }
 
 class _AddSSHState extends State<AddSSH> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String hostname;
   String username;
   String password;
