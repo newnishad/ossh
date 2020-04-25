@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ssh/ssh.dart';
 import 'package:sqflite/sqflite.dart';
 import 'widgets.dart';
+import 'dart:async';
 
 class AddSSH extends StatefulWidget {
   final update;
@@ -192,7 +193,7 @@ class _AddSSHState extends State<AddSSH> {
         Navigator.pop(context);
       }
     }).catchError((e) {
-      print("Exception: Connection Failed!");
+      print("Exception: " + e.toString());
       Navigator.pop(context);
     });
   }
