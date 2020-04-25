@@ -181,6 +181,7 @@ class _AddSSHState extends State<AddSSH> {
     client.connect().then((response) {
       if (response.toString() == "session_connected") {
         print("Connected Successfully");
+        client.disconnect();
         _insertProfile(
           context: context,
           hostname: hostname,
