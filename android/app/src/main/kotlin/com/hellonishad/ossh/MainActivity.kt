@@ -1,4 +1,4 @@
-package com.example.lssh
+package com.hellonishad.ossh
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
