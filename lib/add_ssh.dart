@@ -44,125 +44,144 @@ class _AddSSHState extends State<AddSSH> {
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(
-          widget.update ? "Update" : "Add",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.white,
-            fontWeight: FontWeight.w500,
+    return WillPopScope(
+      onWillPop: () {
+        Navigator.pop(context);
+        return;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Container(
+              color: Colors.transparent,
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+          title: Text(
+            widget.update ? "Update" : "Add",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
-      ),
-      body: Container(
-        height: height - MediaQuery.of(context).padding.top,
-        padding: EdgeInsets.symmetric(
-          horizontal: width * 0.03,
-        ),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                TextFormField(
-                  initialValue: hostname,
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return "Can't be empty";
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    hostname = value;
-                  },
-                  decoration: InputDecoration(
-                    labelText: "Hostname",
-                  ),
-                ),
-                SizedBox(
-                  height: height * 0.02,
-                ),
-                TextFormField(
-                  initialValue: username,
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return "Can't be empty";
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    username = value;
-                  },
-                  decoration: InputDecoration(
-                    labelText: "Username",
-                  ),
-                ),
-                SizedBox(
-                  height: height * 0.02,
-                ),
-                TextFormField(
-                  initialValue: password,
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return "Can't be empty";
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    password = value;
-                  },
-                  decoration: InputDecoration(
-                    labelText: "Password",
-                  ),
-                ),
-                SizedBox(
-                  height: height * 0.02,
-                ),
-                TextFormField(
-                  keyboardType: TextInputType.number,
-                  initialValue: port.toString(),
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return "Can't be empty";
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    port = int.parse(value);
-                  },
-                  decoration: InputDecoration(
-                    labelText: "Port",
-                  ),
-                ),
-                SizedBox(
-                  height: height * 0.04,
-                ),
-                RaisedButton(
-                  color: Theme.of(context).primaryColor,
-                  onPressed: () {
-                    _formKey.currentState.save();
-                    if (!_formKey.currentState.validate()) {
-                      return;
-                    }
-                    connect(context);
-                  },
-                  child: Text(
-                    widget.update ? "Update Profile" : "Add Profile",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
+        body: Container(
+          height: height - MediaQuery.of(context).padding.top,
+          padding: EdgeInsets.symmetric(
+            horizontal: width * 0.03,
+          ),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  TextFormField(
+                    initialValue: hostname,
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "Can't be empty";
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      hostname = value;
+                    },
+                    decoration: InputDecoration(
+                      labelText: "Hostname",
                     ),
                   ),
-                ),
-                SizedBox(
-                  height: height * 0.04,
-                ),
-              ],
+                  SizedBox(
+                    height: height * 0.02,
+                  ),
+                  TextFormField(
+                    initialValue: username,
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "Can't be empty";
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      username = value;
+                    },
+                    decoration: InputDecoration(
+                      labelText: "Username",
+                    ),
+                  ),
+                  SizedBox(
+                    height: height * 0.02,
+                  ),
+                  TextFormField(
+                    initialValue: password,
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "Can't be empty";
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      password = value;
+                    },
+                    decoration: InputDecoration(
+                      labelText: "Password",
+                    ),
+                  ),
+                  SizedBox(
+                    height: height * 0.02,
+                  ),
+                  TextFormField(
+                    keyboardType: TextInputType.number,
+                    initialValue: port.toString(),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "Can't be empty";
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      port = int.parse(value);
+                    },
+                    decoration: InputDecoration(
+                      labelText: "Port",
+                    ),
+                  ),
+                  SizedBox(
+                    height: height * 0.04,
+                  ),
+                  RaisedButton(
+                    color: Theme.of(context).primaryColor,
+                    onPressed: () {
+                      _formKey.currentState.save();
+                      if (!_formKey.currentState.validate()) {
+                        return;
+                      }
+                      connect(context);
+                    },
+                    child: Text(
+                      widget.update ? "Update Profile" : "Add Profile",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: height * 0.04,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

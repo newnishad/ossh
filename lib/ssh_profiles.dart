@@ -150,10 +150,9 @@ class _SshProfilesState extends State<SshProfiles> {
         );
       },
     );
-
-    profiles = await database.rawQuery('SELECT * FROM profiles');
-    print(profiles);
+    var result = await database.rawQuery('SELECT * FROM profiles');
     setState(() {
+      profiles = result;
       _isLoading = false;
     });
   }
@@ -222,6 +221,7 @@ class _SshProfilesState extends State<SshProfiles> {
         builder: (BuildContext context) => AddSSH(),
       ),
     );
+    print("Back from add screen");
     setState(() {
       _isLoading = true;
     });
