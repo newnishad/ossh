@@ -64,9 +64,9 @@ class _SshProfilesState extends State<SshProfiles> {
                   },
                   itemCount: profiles.length,
                   itemBuilder: (BuildContext context, index) {
-                    var key = Key(index.toString());
                     return GestureDetector(
                       onTap: () {
+                        _updateLastUsed(profile: profiles[index]);
                         connect(
                           context: context,
                           hostname: profiles[index]['hostname'],
@@ -75,34 +75,13 @@ class _SshProfilesState extends State<SshProfiles> {
                           port: profiles[index]['port'],
                         );
                       },
-                      child: Dismissible(
-                        key: key,
-                        background: Container(
-                          alignment: AlignmentDirectional.centerStart,
-                          color: Colors.blue,
-                          child: Padding(
-                            padding: EdgeInsets.only(left: width * 0.04),
-                            child: Icon(
-                              Icons.edit,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        secondaryBackground: Container(
-                          alignment: AlignmentDirectional.centerEnd,
-                          color: Colors.redAccent,
-                          child: Padding(
-                            padding: EdgeInsets.only(right: width * 0.04),
-                            child: Icon(
-                              Icons.remove,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        onDismissed: (v) {
-                          if (v.toString() == "DismissDirection.endToStart") {
-                            _deleteProfile(profiles[index]['id']);
-                          } else {
+                      onLongPress: () {
+                        CustomWidgets.editDeleteDialog(
+                          context: context,
+                          profile: profiles[index],
+                          index: index,
+                          editTap: () {
+                            Navigator.pop(context);
                             _update(
                               context: context,
                               id: profiles[index]['id'],
@@ -111,15 +90,19 @@ class _SshProfilesState extends State<SshProfiles> {
                               password: profiles[index]['password'],
                               port: profiles[index]['port'],
                             );
-                          }
-                        },
-                        child: ListTile(
-                          title: Text(
-                            "${profiles[index]['username']}@${profiles[index]['hostname']}:${profiles[index]['port']}",
-                          ),
-                          subtitle:
-                              Text("Last used: ${profiles[index]['lastused']}"),
+                          },
+                          deleteTap: () {
+                            Navigator.pop(context);
+                            _deleteProfile(profiles[index]['id']);
+                          },
+                        );
+                      },
+                      child: ListTile(
+                        title: Text(
+                          "${profiles[index]['username']}@${profiles[index]['hostname']}:${profiles[index]['port']}",
                         ),
+                        subtitle:
+                            Text("Last used: ${time(profiles[index]['lastused'])}"),
                       ),
                     );
                   },
@@ -195,14 +178,10 @@ class _SshProfilesState extends State<SshProfiles> {
       if (response.toString() == "session_connected") {
         print("Connected Successfully");
         Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => Shell(
-              client,
-              "$username@$hostname:$port",
-            ),
-          ),
+        _navigateToShell(
+          context: context,
+          client: client,
+          title: "$username@$hostname:$port",
         );
       } else {
         print("Connection Failed");
@@ -212,6 +191,26 @@ class _SshProfilesState extends State<SshProfiles> {
       print("Exception: Connection Failed!");
       Navigator.pop(context);
     });
+  }
+
+  _navigateToShell(
+      {@required context, @required client, @required title}) async {
+    var reply = Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => Shell(
+          client,
+          title,
+        ),
+      ),
+    );
+    print("Reply: $reply");
+    if (reply.toString() != "anything") {
+      setState(() {
+        _isLoading = true;
+      });
+      _loadProfiles();
+    }
   }
 
   _add(context) async {
@@ -246,5 +245,79 @@ class _SshProfilesState extends State<SshProfiles> {
       _isLoading = true;
     });
     _loadProfiles();
+  }
+
+  _updateLastUsed({
+    @required profile,
+  }) async {
+    var databasesPath = await getDatabasesPath();
+    String path = databasesPath + 'ssh.db';
+
+    Database database = await openDatabase(
+      path,
+      version: 1,
+      onCreate: (Database db, int version) async {
+        await db.execute(
+          'CREATE TABLE profiles (id INTEGER PRIMARY KEY, hostname TEXT, username TEXT, password TEXT, port INTEGER, lastused TEXT)',
+        );
+      },
+    );
+
+    await database.rawUpdate(
+        'UPDATE profiles SET hostname = ?, username = ?, password = ?, port = ?, lastused = ? WHERE id = ?',
+        [
+          profile['hostname'],
+          profile['username'],
+          profile['password'],
+          profile['port'],
+          DateTime.now().toString(),
+          profile['id'],
+        ]);
+  }
+
+  String time(text) {
+    var time = DateTime.parse(text);
+    String month;
+    String day = time.day.toString();
+    String year = time.year.toString();
+    switch (time.month) {
+      case 1:
+        month = "January";
+        break;
+      case 2:
+        month = "February";
+        break;
+      case 3:
+        month = "March";
+        break;
+      case 4:
+        month = "April";
+        break;
+      case 5:
+        month = "May";
+        break;
+      case 6:
+        month = "June";
+        break;
+      case 7:
+        month = "July";
+        break;
+      case 8:
+        month = "August";
+        break;
+      case 9:
+        month = "September";
+        break;
+      case 10:
+        month = "October";
+        break;
+      case 11:
+        month = "November";
+        break;
+      case 12:
+        month = "December";
+        break;
+    }
+    return "$month $day, $year";
   }
 }

@@ -66,7 +66,7 @@ class _AddSSHState extends State<AddSSH> {
           automaticallyImplyLeading: false,
           centerTitle: true,
           title: Text(
-            widget.update ? "Update" : "Add",
+            widget.update ? "Update" : "Add SSH Connection",
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
@@ -124,6 +124,7 @@ class _AddSSHState extends State<AddSSH> {
                   ),
                   TextFormField(
                     initialValue: password,
+                    obscureText: true,
                     validator: (value) {
                       if (value.isEmpty) {
                         return "Can't be empty";
